@@ -1,6 +1,5 @@
 from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel
-from typing import List
 
 
 class CompletedJob(BaseModel):
@@ -61,6 +60,7 @@ class CompletedJob(BaseModel):
     shortwave_radiation_sum: float
     et0_fao_evapotranspiration_daily: float
 
+
 class JobInfo(BaseModel):
     id: int
     latitude: float
@@ -86,13 +86,16 @@ async def startup_event():
     vars["index"] = 0
     with open("interim_sample.csv", "r") as file:
         data = file.readlines()
+    with open("completed_data.csv", 'w') as file:
+        file.close()
 
     vars["data"] = data
+    vars["error_count"] = 0
 
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Distributed Scraping Network"}
 
 
 @app.get("/job/", status_code=200)
@@ -104,14 +107,32 @@ async def get_next_job():
     return format_job_info(response)
 
 
+@app.post("/error/", status_code=200)
+async def update_error_count():
+    vars["error_count"] = vars["error_count"] + 1
+
+
 @app.post("/job/", status_code=200)
 async def post_completed_job(job: CompletedJob):
     with open("completed_data.csv", "a") as file:
-        file.write(str(job))
+        job_dict = list(job.dict().values())
+        file.write(','.join(str(x) for x in job_dict))
+        file.write('\n')
 
 
 @app.get("/jobs_completed/", status_code=200)
-async def get_all_completed_jobs(start: int | None, end: int | None):
+async def get_all_completed_jobs(start: int | None = None, end: int | None = None):
     with open("completed_data.csv", "r") as file:
         data = file.readlines()
-    return data
+
+    if end is None and start is None:  # Handling for None start and end indices
+        return data
+    else:  # Return data between specified start and end indices
+        end = min(end, len(data))
+        return data[start: end]
+
+
+@app.get("/total_errors/", status_code=200)
+async def get_number_errors():
+    return {"errors": vars["error_count"]}
+
