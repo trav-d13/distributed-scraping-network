@@ -8,8 +8,6 @@ class CompletedJob(BaseModel):
     lat: float
     lon: float
     observed_on: str
-    generationtime_ms: float
-    timezone: str
     elevation: float
     time: List[str]
     temperature_2m: List[float]
@@ -22,12 +20,13 @@ class JobInfo(BaseModel):
     longitude: float
     start_date: str
     end_date: str
+    obs_time: str
 
 
 def format_job_info(response: str) -> JobInfo:
     response = response.strip().split(",")
     return JobInfo(id=int(response[0]), latitude=float(response[3]), longitude=float(response[4]),
-                   start_date=response[1], end_date=response[1])
+                   start_date=response[1], end_date=response[1], obs_time=response[2])
 
 
 vars = {}
