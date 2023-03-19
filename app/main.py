@@ -16,6 +16,20 @@ class CompletedJob(BaseModel):
     dewpoint_2m: List[float]
 
 
+class JobInfo(BaseModel):
+    id: int
+    latitude: float
+    longitude: float
+    start_date: str
+    end_date: str
+
+
+def format_job_info(response: str) -> JobInfo:
+    response = response.strip().split(",")
+    return JobInfo(id=int(response[0]), latitude=float(response[3]), longitude=float(response[4]),
+                   start_date=response[1], end_date=response[1])
+
+
 vars = {}
 
 app = FastAPI()
@@ -39,10 +53,9 @@ async def root():
 async def get_next_job():
     data = vars["data"]
     index = vars["index"]
-    print(index, data)
     response = data[index]
     vars["index"] = vars["index"] + 1
-    return {"message": response}
+    return format_job_info(response)
 
 
 @app.post("/job/", status_code=200)
