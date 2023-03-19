@@ -15,12 +15,19 @@ class CompletedJob(BaseModel):
     temperature_2m: List[float]
     dewpoint_2m: List[float]
 
+
 class JobInfo(BaseModel):
     id: int
     latitude: float
     longitude: float
     start_date: str
     end_date: str
+
+
+def format_job_info(response: str) -> JobInfo:
+    response = response.strip().split(",")
+    return JobInfo(id=int(response[0]), latitude=float(response[3]), longitude=float(response[4]),
+                   start_date=response[1], end_date=response[1])
 
 
 vars = {}
@@ -47,10 +54,8 @@ async def get_next_job():
     data = vars["data"]
     index = vars["index"]
     response = data[index]
-    response = response.strip().split(",")
     vars["index"] = vars["index"] + 1
-    return JobInfo(id = int(response[0]), latitude = float(response[3]), longitude = float(response[4]),
-                    start_date = response[1], end_date = response[1])
+    return format_job_info(response)
 
 
 @app.post("/job/", status_code=200)
