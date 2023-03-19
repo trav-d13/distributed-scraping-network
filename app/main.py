@@ -1,9 +1,5 @@
-import json
-import math
-
 from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel
-from typing import List
 
 
 class CompletedJob(BaseModel):
