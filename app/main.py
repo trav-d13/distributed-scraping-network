@@ -94,7 +94,7 @@ async def startup_event():
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Distributed Scraping Network"}
 
 
 @app.get("/job/", status_code=200)
@@ -122,6 +122,5 @@ async def get_all_completed_jobs(start: int | None = None, end: int | None = Non
         return data
     else:  # Return data between specified start and end indices
         end = min(end, len(data))
-        print(len(data))
         return data[start: end]
 
