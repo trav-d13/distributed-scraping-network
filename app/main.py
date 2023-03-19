@@ -1,3 +1,5 @@
+import math
+
 from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel
 from typing import List
@@ -107,11 +109,19 @@ async def get_next_job():
 @app.post("/job/", status_code=200)
 async def post_completed_job(job: CompletedJob):
     with open("completed_data.csv", "a") as file:
-        file.write(str(job))
+        file.write(str(job))  # Write completed data to file
+        file.write('\n')  # Write new line
 
 
 @app.get("/jobs_completed/", status_code=200)
-async def get_all_completed_jobs(start: int | None, end: int | None):
+async def get_all_completed_jobs(start: int | None = None, end: int | None = None):
     with open("completed_data.csv", "r") as file:
         data = file.readlines()
-    return data
+
+    if end is None and start is None:  # Handling for None start and end indices
+        return data
+    else:  # Return data between specified start and end indices
+        end = min(end, len(data))
+        print(len(data))
+        return data[start: end]
+
