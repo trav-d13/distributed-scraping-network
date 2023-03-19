@@ -104,6 +104,9 @@ async def get_next_job():
     index = vars["index"]
     response = data[index]
     vars["index"] = vars["index"] + 1
+
+    if vars["index"] >= len(vars["data"]):
+        return None
     return format_job_info(response)
 
 
