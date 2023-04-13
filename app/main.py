@@ -84,7 +84,7 @@ app = FastAPI()
 @app.on_event("startup")
 async def startup_event():
     vars["index"] = 0
-    with open("interim_proboscidea.csv", "r") as file:
+    with open("interim_sample.csv", "r") as file:
         data = file.readlines()
     with open("completed_data.csv", 'w') as file:
         file.close()
